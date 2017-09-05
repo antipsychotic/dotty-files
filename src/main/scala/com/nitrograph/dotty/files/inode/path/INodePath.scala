@@ -1,11 +1,24 @@
 package com.nitrograph.dotty.files.inode.path
 
-sealed trait INodePath
+import java.nio.file.{Paths, Path}
 
-case object Root extends INodePath
-case object WorkDirectory extends INodePath
+sealed trait INodePathTrait {
+    def toJavaPath: Path
+}
 
-case class Path(
+case object Root extends INodePathTrait {
+    def toJavaPath: Path = Paths.get("/")
+}
+
+case object WorkDirectory extends INodePathTrait {
+    def toJavaPath: Path = Paths.get(".")
+}
+
+case class INodePath(
     root: INodePath,
     directories: List[String]
-) extends INodePath
+) extends INodePathTrait {
+    def toJavaPath: Path = root.toJavaPath.resolve(
+        directories.mkString("/")
+    )
+}
